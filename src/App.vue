@@ -7,8 +7,17 @@
 
 <script>
 import FooterNav from './components/FooterNav/FooterNav'
+import {mapActions} from 'vuex'
 export default {
   name: 'App',
+  methods: {
+    //定位当前位置获得当前位置的名称
+    ...mapActions(['getAddress'])
+  },
+  created() {
+    //使用actions获得当前位置
+    this.getAddress()
+  },
   components:{
     FooterNav
   } 

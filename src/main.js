@@ -3,6 +3,12 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './store'
+
+//使用axiso的baseURL属性，设置baseURL的值，解决跨域请求数据
+import axios from 'axios'
+import  apiConfig from '../config/api.config'
+axios.defaults.baseURL=apiConfig.baseURL
 
 Vue.config.productionTip = false
 
@@ -10,6 +16,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

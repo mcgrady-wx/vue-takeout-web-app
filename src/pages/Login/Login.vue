@@ -1,4 +1,5 @@
 <template>
+    <!-- 登陆注册 -->
     <section class="loginContainer">
       <div class="loginInner">
         <div class="login_header">

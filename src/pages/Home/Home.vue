@@ -2,7 +2,7 @@
     <!-- 首页 -->
     <section class="msite">
         <!--首页头部-->
-        <HeaderTop title="高新区娇子大道233号中海国际中心">
+        <HeaderTop :title="address.name">
           <span class="header_search" slot="left">
             <i class="iconfont icon-sousuo"></i>
           </span>
@@ -13,106 +13,14 @@
         <!--首页导航-->
         <nav class="msite_nav">
           <swiper class="swiper-container" :options="swiperOptions">
-            <swiper-slide class="swiper-slide">
-              <a href="javascript:" class="link_to_food">
+            <swiper-slide class="swiper-slide" v-for="(categorys,index) in categorysArr" :key="index">
+              <a href="javascript:" class="link_to_food" v-for="(category,index) in categorys" :key="index">
                 <div class="food_container">
-                  <img src="./images/nav/1.jpg">
+                  <img :src="baseImageUrl+category.image_url">
                 </div>
-                <span>甜品饮品</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/2.jpg">
-                </div>
-                <span>商超便利</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/3.jpg">
-                </div>
-                <span>美食</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/4.jpg">
-                </div>
-                <span>简餐</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/5.jpg">
-                </div>
-                <span>新店特惠</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/6.jpg">
-                </div>
-                <span>准时达</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/7.jpg">
-                </div>
-                <span>预订早餐</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/8.jpg">
-                </div>
-                <span>土豪推荐</span>
+                <span>{{category.title}}</span>
               </a>
             </swiper-slide>
-            <swiper-slide class="swiper-slide">
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/9.jpg">
-                </div>
-                <span>甜品饮品</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/10.jpg">
-                </div>
-                <span>商超便利</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/11.jpg">
-                </div>
-                <span>美食</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/12.jpg">
-                </div>
-                <span>简餐</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/13.jpg">
-                </div>
-                <span>新店特惠</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/14.jpg">
-                </div>
-                <span>准时达</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/1.jpg">
-                </div>
-                <span>预订早餐</span>
-              </a>
-              <a href="javascript:" class="link_to_food">
-                <div class="food_container">
-                  <img src="./images/nav/2.jpg">
-                </div>
-                <span>土豪推荐</span>
-              </a>
-            </swiper-slide> 
             <!-- Add Pagination -->
             <div class="swiper-pagination" slot="pagination"></div>
           </swiper>
@@ -129,25 +37,52 @@
 </template>
 
 <script>
-// import Swiper from 'swiper'
-// import 'swiper/swiper-bundle.css'
+// 局部使用swiper轮播插件
 import { Swiper, SwiperSlide } from 'vue-awesome-swiper'
 import 'swiper/swiper-bundle.css'
 
 import HeaderTop from '../../components/HeaderTop/HeaderTop'
 import ShopList from '../../components/ShopList/ShopList'
+
+import {mapState,mapActions} from 'vuex'
+
 export default {
     data() {
       return {
         swiperOptions: {
-          pagination: {
+          pagination: {//小圆点
             el:'.swiper-pagination',
             clickable:true,
           },
           loop: true,// 无缝轮播
           // Some Swiper option/callback...
-        }
+        },
+        baseImageUrl: 'https://fuss10.elemecdn.com'
       }
+    },
+    mounted() {
+      this.getCategorys()//获取轮播分类列表
+      this.getShops()//获取商家列表
+    },
+    computed: {
+      ...mapState(['address','categorys',]),
+      //得到的categorys是一个一维数组，我们需要的是一个二维数组，每个元素也是数组，数组的lenght为8个
+      categorysArr(){
+        let arr=[]//新的二维数组
+        //每个小数组的length为8，那么用一维数组除以8，再向上取整得到一共需要几个数组
+        let num=Math.ceil(this.categorys.length/8)
+        //循环num次，把原来的一维数组使用splice方法每8个分割出来，再添加到arr中，splice方法要改变元素组，所有需要定一个变量保存原一维数组
+        let _categorys=this.categorys
+        for (let index = 0; index < num; index++) {
+          let minarr=_categorys.splice(0,8)
+          arr.push(minarr)
+        }
+        //console.log(arr)
+        return arr
+      }
+    },
+    methods: {
+      ...mapActions(['getCategorys','getShops'])
     },
     components:{
       HeaderTop,
