@@ -12,7 +12,7 @@
         </HeaderTop>
         <!--首页导航-->
         <nav class="msite_nav">
-          <swiper class="swiper-container" :options="swiperOptions">
+          <swiper class="swiper-container" :options="swiperOptions" v-if="categorysArr.length">
             <swiper-slide class="swiper-slide" v-for="(categorys,index) in categorysArr" :key="index">
               <a href="javascript:" class="link_to_food" v-for="(category,index) in categorys" :key="index">
                 <div class="food_container">
@@ -24,6 +24,7 @@
             <!-- Add Pagination -->
             <div class="swiper-pagination" slot="pagination"></div>
           </swiper>
+          <img src="./images/msite_back.svg" alt="" v-else>
         </nav>
         <!--首页附近商家-->
         <div class="msite_shop_list">
@@ -68,10 +69,10 @@ export default {
       ...mapState(['address','categorys',]),
       //得到的categorys是一个一维数组，我们需要的是一个二维数组，每个元素也是数组，数组的lenght为8个
       categorysArr(){
-        let arr=[]//新的二维数组
+        let arr=[]//保存新的二维数组
         //每个小数组的length为8，那么用一维数组除以8，再向上取整得到一共需要几个数组
         let num=Math.ceil(this.categorys.length/8)
-        //循环num次，把原来的一维数组使用splice方法每8个分割出来，再添加到arr中，splice方法要改变元素组，所有需要定一个变量保存原一维数组
+        //循环num次，把原来的一维数组使用splice方法每8个分割出来，再添加到arr中，splice方法要改变原数组，所有需要定一个变量保存原一维数组
         let _categorys=this.categorys
         for (let index = 0; index < num; index++) {
           let minarr=_categorys.splice(0,8)
