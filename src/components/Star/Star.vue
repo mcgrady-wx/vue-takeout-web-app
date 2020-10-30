@@ -1,4 +1,5 @@
 <template>
+    <!-- 评价显示心心 -->
     <div class="star" :class="'star-'+size">
         <span class="star-item on" v-for="(sc, index) in starClasses" :class="sc" :key="index"></span>
     </div>
