@@ -39,7 +39,7 @@
                 </section>
                 <section class="login_message">
                   <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                  <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                  <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha" @click="getCaptcha" ref="captcha">
                 </section>
               </section>
             </div>
@@ -57,6 +57,7 @@
 
 <script>
 import AlertTip from '../../components/AlertTip/AlertTip'
+import {reqSendCode,reqPwdLogin,reqSmsLogin} from '../../api'
 export default {
     data() {
       return {
@@ -82,7 +83,7 @@ export default {
         gotoBack(){//返回
           this.$router.back()
         },
-        getCode(){//获取手机验证码
+        async getCode(){//获取手机验证码
           if (this.intervalId) {//避免重复点击
             return 
           }
@@ -95,8 +96,23 @@ export default {
               this.intervalId=''
             }
           }, 1000);
+          // 发送ajax请求(向指定手机号发送验证码短信)
+          const result=await reqSendCode(this.phone)
+          if (result.code===1) {//短信验证码发送失败
+            //显示提示
+            this.alertText="验证码发送失败"
+            this.alertShow=true
+            //停止计时器
+            if (this.computeTime) {
+              this.computeTime=0
+              clearInterval(this.intervalId)
+              this.intervalId=''
+            }
+          }
+
         },
-        login(){//登录
+        async login(){//登录
+          let result //保存请求结果
           //首先进行表单验证，确定数据是否都已经填写，然后再收集信息，发起登录请求
           if (this.loginWay) {//短信登陆
             if (!this.rightPhone) {//判断手机号，取反表示手机号格式错误或者不存在
@@ -108,7 +124,15 @@ export default {
               this.alertShow=true
               return
             }
-          } else {//用户密码登录
+            // 发送ajax请求短信登陆，同时停止计时器
+            result =await reqSmsLogin(this.phone,this.code)
+            if (this.computeTime) {
+              this.computeTime=0
+              clearInterval(this.intervalId)
+              this.intervalId=''
+            }
+
+          } else {//账户密码登录
             if (!this.name) {//判断用户名，取反表示用户名为空
               this.alertText="用户名为空"
               this.alertShow=true
@@ -121,12 +145,32 @@ export default {
               this.alertText="图形验证码为空"
               this.alertShow=true
               return
-            } 
+            }
+            // 发送ajax请求账户密码登陆
+            const {name, pwd, captcha} = this
+            result =await reqPwdLogin({name, pwd, captcha})
+          }
+          //根据结果数据处理
+          if (result.code===0) {//登录成功
+            //将user保存到vuex的state
+
+            // 去个人中心界面
+            this.$router.replace('/profile')
+          } else {//登录失败
+            // 显示新的图片验证码
+            this.getCaptcha()
+            // 显示警告提示
+            this.alertText=result.msg
+            this.alertShow=true
           }
         },
         closeTip(){//关闭错误提示
           this.alertShow=false
           this.alertText=""
+        },
+        getCaptcha(){//切换验证码
+          //通过点击，更改src属性实现src的变化重新发起请求，得到新的验证码
+          this.$refs.captcha.src="http://localhost:4000/captcha?time="+Date.now()
         }
     },
     components:{

@@ -25,7 +25,7 @@ export default function ajax(url='',data={},type="GET"){
             //发起get请求
             promise=axios.get(url)
         } else {//发送post请求
-            promise=axios.post(url,)
+            promise=axios.post(url,data)
         }
         //使用.then方法处理请求成功得到的promise数据，.catch处理请求失败的数据
         promise.then((response)=>{
