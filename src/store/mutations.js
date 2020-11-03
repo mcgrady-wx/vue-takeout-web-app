@@ -1,7 +1,8 @@
 import {
     RECEIVE_ADDRESS,
     RECEIVE_CATEGORYS,
-    RECEIVE_SHOPS
+    RECEIVE_SHOPS,
+    RECEIVE_USER_INFO
 } from './mutation-types'
 
 const mutations={
@@ -13,6 +14,9 @@ const mutations={
     },
     [RECEIVE_SHOPS](state,shops){//获取到商家数组
         state.shops = shops
+    },
+    [RECEIVE_USER_INFO](state,userInfo){
+        state.userInfo=userInfo
     }
 }
 

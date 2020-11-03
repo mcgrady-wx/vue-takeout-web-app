@@ -12,11 +12,13 @@ export default {
   name: 'App',
   methods: {
     //定位当前位置获得当前位置的名称
-    ...mapActions(['getAddress'])
+    ...mapActions(['getAddress','getUserInfo'])
   },
   created() {
     //使用actions获得当前位置
     this.getAddress()
+    //使用actions获得当前登录账号的信息，避免刷新需要重新登录
+    this.getUserInfo()
   },
   components:{
     FooterNav

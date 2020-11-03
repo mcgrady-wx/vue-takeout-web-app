@@ -1,29 +1,53 @@
 import {
     RECEIVE_ADDRESS,
     RECEIVE_CATEGORYS,
-    RECEIVE_SHOPS
+    RECEIVE_SHOPS,
+    RECEIVE_USER_INFO
 } from './mutation-types'
 
 import {
     reqAddress, 
     reqCategorys, 
-    reqShops
+    reqShops,
+    reqUserInfo,
+    reqLogout
 } from '../api'
 
 const actions={
     async getAddress({commit,state}){// 异步获取地址
         let geohash=state.latitude + ',' + state.longitude
         let address = await reqAddress(geohash)
-        commit(RECEIVE_ADDRESS,address.data)
+        if (address.code===0) {//成功
+            commit(RECEIVE_ADDRESS,address.data)
+        }   
     },
     async getCategorys({commit}){// 异步获取分类列表
         let categorys = await reqCategorys()
-        commit(RECEIVE_CATEGORYS,categorys.data)
+        if (categorys.code===0) {//成功
+            commit(RECEIVE_CATEGORYS,categorys.data)
+        }   
     },
     async getShops({commit,state}){// 异步获取商家列表
         const {latitude,longitude}=state
         let shops = await reqShops({latitude,longitude})
-        commit(RECEIVE_SHOPS,shops.data)
+        if (shops.code===0) {//成功
+            commit(RECEIVE_SHOPS,shops.data)
+        }    
+    },
+    recordUser({commit},userinfo){//同步获得用户信息
+        commit(RECEIVE_USER_INFO,userinfo)
+    },
+    async getUserInfo({commit}){// 异步获取用户信息。服务器会保存登录信息1天，通过异步请求获得用户信息避免网页刷新需要重新登录
+        let userInfo = await reqUserInfo()
+        if (userInfo.code===0) {//请求成功
+            commit(RECEIVE_USER_INFO,userInfo.data)
+        }  
+    },
+    async logout({commit}){// 异步退出登录
+        let result = await reqLogout()
+        if (result.code===0) {//请求成功，置为空
+            commit(RECEIVE_USER_INFO,{})
+        }  
     }
 }
 

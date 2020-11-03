@@ -58,6 +58,7 @@
 <script>
 import AlertTip from '../../components/AlertTip/AlertTip'
 import {reqSendCode,reqPwdLogin,reqSmsLogin} from '../../api'
+import {mapActions, mapGetters} from 'vuex'
 export default {
     data() {
       return {
@@ -80,6 +81,7 @@ export default {
       }
     },
     methods: {
+        ...mapActions(['recordUser']),
         gotoBack(){//返回
           this.$router.back()
         },
@@ -153,7 +155,7 @@ export default {
           //根据结果数据处理
           if (result.code===0) {//登录成功
             //将user保存到vuex的state
-
+            this.recordUser(result.data)
             // 去个人中心界面
             this.$router.replace('/profile')
           } else {//登录失败

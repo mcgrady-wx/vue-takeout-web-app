@@ -3,12 +3,15 @@
     <section class="msite">
         <!--首页头部-->
         <HeaderTop :title="address.name">
-          <span class="header_search" slot="left">
-            <i class="iconfont icon-sousuo"></i>
-          </span>
-          <span class="header_login" slot="right">
-            <span class="header_login_text">登录|注册</span>
-          </span>
+          <router-link class="header_search" slot="left" to="/search" tag="span">
+            <i class="iconfont icon-sousuo" style="font-size:25px;color:#fff"></i>
+          </router-link>
+          <router-link class="header_login" slot="right" tag="span" :to="userInfo._id?'/userinfo':'/login'">
+            <span class="header_login_text" v-if="userInfo._id">
+              <i class="iconfont icon-icon_personal"></i>
+            </span>
+            <span class="header_login_text" v-else>登录|注册</span>
+          </router-link>
         </HeaderTop>
         <!--首页导航-->
         <nav class="msite_nav">
@@ -66,7 +69,7 @@ export default {
       this.getShops()//获取商家列表
     },
     computed: {
-      ...mapState(['address','categorys',]),
+      ...mapState(['address','categorys','userInfo']),
       //得到的categorys是一个一维数组，我们需要的是一个二维数组，每个元素也是数组，数组的lenght为8个
       categorysArr(){
         let arr=[]//保存新的二维数组
