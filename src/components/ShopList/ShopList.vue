@@ -2,7 +2,7 @@
     <!-- 商家列表 -->
     <div class="shop_container">
             <ul class="shop_list" v-if="shops.length">
-              <li class="shop_li border-1px" v-for="(shop,index) in shops" :key="index">
+              <li class="shop_li border-1px" v-for="(shop,index) in shops" :key="index" @click="goToShop(shop.id)">
                 <a>
                   <div class="shop_left">
                     <img class="shop_img" :src="shop.image_path">
@@ -56,6 +56,11 @@ export default {
     computed: {
       ...mapState(['shops'])
     },
+    methods: {
+      goToShop(id){//跳转到商铺详情页
+        this.$router.push(`/shop/${id}`)
+      }
+    },  
     components:{
       Star
     }
