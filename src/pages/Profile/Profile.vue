@@ -18,7 +18,7 @@
               </p>
             </div>
             <span class="arrow">
-              <i class="iconfont icon-icon_arrow_right"></i>
+              <i class="iconfont icon-icon_arrow_right" style="color:white;"></i>
             </span>
           </router-link>
         </section>

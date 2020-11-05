@@ -9,6 +9,9 @@ import store from './store'
 import { Button } from 'mint-ui';
 Vue.component(Button.name, Button);
 
+//使用mock模拟数据
+import './mock/mockServer'
+
 //使用axiso的baseURL属性，设置baseURL的值，解决跨域请求数据
 import axios from 'axios'
 import  apiConfig from '../config/api.config'

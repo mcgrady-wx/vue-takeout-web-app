@@ -30,3 +30,8 @@ export const reqUserInfo = () => ajax('/userinfo')
 
 // 用户登出
 export const reqLogout = () => ajax('/logout')
+
+/**
+ * 获取商家信息
+*/
+export const reqShop = (id) => ajax(`/shop/${id}`)

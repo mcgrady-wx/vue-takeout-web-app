@@ -2,7 +2,10 @@ import {
     RECEIVE_ADDRESS,
     RECEIVE_CATEGORYS,
     RECEIVE_SHOPS,
-    RECEIVE_USER_INFO
+    RECEIVE_USER_INFO,
+    RECEIVE_GOODS,
+    RECEIVE_RATINGS,
+    RECEIVE_INFO
 } from './mutation-types'
 
 import {
@@ -10,7 +13,8 @@ import {
     reqCategorys, 
     reqShops,
     reqUserInfo,
-    reqLogout
+    reqLogout,
+    reqShop
 } from '../api'
 
 const actions={
@@ -47,6 +51,14 @@ const actions={
         let result = await reqLogout()
         if (result.code===0) {//请求成功，置为空
             commit(RECEIVE_USER_INFO,{})
+        }  
+    },
+    async getShop({commit},id){// 异步获取商品所有信息
+        let result = await reqShop(id)
+        if (result.code===0) {//请求成功，分别保存商铺信息，商家评价数组和商铺商品列表
+            commit(RECEIVE_GOODS,result.data.goods)
+            commit(RECEIVE_RATINGS,result.data.ratings)
+            commit(RECEIVE_INFO,result.data.info)
         }  
     }
 }

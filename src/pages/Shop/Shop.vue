@@ -1,4 +1,5 @@
 <template>
+    <!-- 商品详情页 -->
     <div>
         <ShopHeader />
         <div class="tab">
@@ -18,7 +19,15 @@
 
 <script>
 import ShopHeader from '../../components/ShopHeader/ShopHeader'
+import {mapActions} from 'vuex'
 export default {
+    created() {
+        //console.log(this.$route.params.id)
+        this.getShop(this.$route.params.id)
+    },
+    methods: {
+        ...mapActions(['getShop'])
+    },
     components:{
         ShopHeader
     }
