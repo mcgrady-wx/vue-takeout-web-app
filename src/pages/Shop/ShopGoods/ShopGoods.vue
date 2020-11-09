@@ -4,7 +4,7 @@
         <div class="goods">
             <div class="menu-wrapper" ref="menuWrapper">
                 <ul>
-                    <li class="menu-item current" v-for="(good,index) in goods" :key="good.name">
+                    <li class="menu-item" v-for="(good,index) in goods" :key="good.name" :class="currentIndex===index?'current':''" @click="clickMenuItem(index)">
                         <span class="text bottom-border-1px">
                             <img class="icon" :src="good.icon" v-if="good.icon">
                             {{good.name}}
@@ -13,7 +13,7 @@
                 </ul>
             </div>
             <div class="foods-wrapper" ref="foodsWrapper">
-                <ul>
+                <ul ref="foodsUl">
                     <li class="food-list-hook" v-for="(good,index) in goods" :key="index">
                         <h1 class="title">{{good.name}}</h1>
                         <ul>
@@ -49,13 +49,65 @@
 import {mapState} from 'vuex'
 import BScroll from 'better-scroll'
 export default {
+    data() {
+      return {
+        tops:[],//收集每一个类别距离顶部的距离
+        scrollY:0,//获取在Y轴上的移动距离
+      }
+    },
     computed: {
-        ...mapState(['goods'])
+        ...mapState(['goods']),
+        currentIndex(){//通过收集到的tops和Y轴上的滚动距离scrollY,获得滚动到哪一个列表，返回该列表的下标，让该列表显示高亮
+          let index=0 //初始化
+          //使用findIndex方法，遍历tops，找到满足条件的项，并返回对应的下标
+          const {tops,scrollY}=this
+          index=tops.findIndex((top,index)=>{
+            return scrollY>=top && scrollY<tops[index+1]
+          })
+          return index
+        }
     },
     methods: {
         _initScroll(){//初始化滚动
-            new BScroll('.menu-wrapper')
-            new BScroll('.foods-wrapper')
+            new BScroll('.menu-wrapper',{
+              click:true
+            })
+            this.foodsScroll=new BScroll('.foods-wrapper',{
+              probeType: 2, //使用3，会一直监听，包括惯性滑动的距离，太消耗资源。可以使用scrollEnd方法得到最终停下来的scrollY的值
+              click:true
+            })
+            // 给右侧列表绑定scroll监听
+            this.foodsScroll.on('scroll', ({x,y})=>{
+              //console.log(y)
+              this.scrollY=Math.abs(y)
+            })
+            // 给右侧列表绑定scrollEnd监听
+            this.foodsScroll.on('scrollEnd', ({x,y})=>{
+              //console.log(y)
+              this.scrollY=Math.abs(y)
+            })
+        },
+        _initTops(){//初始化右侧滚动列表的Tops
+            //初始化位置，第一个列表距离顶部的位置为0
+            let top=0
+            this.tops.push(top)
+            //获得所有的li标签
+            const li=this.$refs.foodsUl.getElementsByClassName('food-list-hook')
+            //把li的伪数组转化成数组，在遍历，push到tops中
+            Array.prototype.slice.call(li).forEach(element => {
+              top=top+element.clientHeight
+              this.tops.push(top)
+            });
+            //console.log(this.tops)
+        },
+        clickMenuItem(index){//点击左侧的列表，让右侧滚动到对应的位置
+          //使用scrollTo方法
+          //获得需要滚动的距离
+          let y=this.tops[index]
+          //先左侧列表显示高亮，在移动到相应位置
+          this.scrollY=y
+          //移动到相应位置
+          this.foodsScroll.scrollTo(0,-y,300)
         }
     },
     watch: {
@@ -64,6 +116,7 @@ export default {
             //解决办法，就是监听该数据，当数据变化的时候，再初始化滚动。nextTick方法是延迟执行，确保数据已经更新后再执行
             this.$nextTick(()=>{
                 this._initScroll() //初始化滚动
+                this._initTops() //获得右侧滚动列表的Tops
             })
         }
     }, 
