@@ -33,7 +33,7 @@
                                         <span class="old" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
                                     </div>
                                     <div class="cartcontrol-wrapper">
-                                        CartControl
+                                        <CartControl :food="food"/>
                                     </div>
                                 </div>
                             </li>
@@ -48,6 +48,7 @@
 <script>
 import {mapState} from 'vuex'
 import BScroll from 'better-scroll'
+import CartControl from '../../../components/CartControl/CartControl'
 export default {
     data() {
       return {
@@ -62,6 +63,7 @@ export default {
           //使用findIndex方法，遍历tops，找到满足条件的项，并返回对应的下标
           const {tops,scrollY}=this
           index=tops.findIndex((top,index)=>{
+            // scrollY>=当前top && scrollY<下一个top
             return scrollY>=top && scrollY<tops[index+1]
           })
           return index
@@ -69,9 +71,11 @@ export default {
     },
     methods: {
         _initScroll(){//初始化滚动
+            //左侧分类
             new BScroll('.menu-wrapper',{
               click:true
             })
+            //右侧列表
             this.foodsScroll=new BScroll('.foods-wrapper',{
               probeType: 2, //使用3，会一直监听，包括惯性滑动的距离，太消耗资源。可以使用scrollEnd方法得到最终停下来的scrollY的值
               click:true
@@ -100,11 +104,11 @@ export default {
             });
             //console.log(this.tops)
         },
-        clickMenuItem(index){//点击左侧的列表，让右侧滚动到对应的位置
+        clickMenuItem(index){//点击左侧的分类，让右侧滚动到对应的位置
           //使用scrollTo方法
           //获得需要滚动的距离
           let y=this.tops[index]
-          //先左侧列表显示高亮，在移动到相应位置
+          //先左侧列表显示高亮，再移动到相应位置
           this.scrollY=y
           //移动到相应位置
           this.foodsScroll.scrollTo(0,-y,300)
@@ -112,14 +116,17 @@ export default {
     },
     watch: {
         goods(){
-            //要出现滑动效果，需要有数据。但是页面刚显示是没有数据的，所以不会出现滑动效果
+            //要出现滑动效果，需要有数据。但是页面刚显示是没有数据的，所以使用钩子函数去初始化不会出现滑动效果
             //解决办法，就是监听该数据，当数据变化的时候，再初始化滚动。nextTick方法是延迟执行，确保数据已经更新后再执行
             this.$nextTick(()=>{
                 this._initScroll() //初始化滚动
                 this._initTops() //获得右侧滚动列表的Tops
             })
         }
-    }, 
+    },
+    components:{
+      CartControl
+    } 
 }
 </script>
 

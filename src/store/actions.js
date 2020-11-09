@@ -5,7 +5,9 @@ import {
     RECEIVE_USER_INFO,
     RECEIVE_GOODS,
     RECEIVE_RATINGS,
-    RECEIVE_INFO
+    RECEIVE_INFO,
+    INCREMENT_FOOD_COUNT,
+    DECREMENT_FOOD_COUNT
 } from './mutation-types'
 
 import {
@@ -60,6 +62,13 @@ const actions={
             commit(RECEIVE_RATINGS,result.data.ratings)
             commit(RECEIVE_INFO,result.data.info)
         }  
+    },
+    updateFoodCount({commit},{isAdd,food}){// 同步更新food中的count值
+        if (isAdd) {//增加
+            commit(INCREMENT_FOOD_COUNT,food)
+        } else { //减少
+            commit(DECREMENT_FOOD_COUNT,food)
+        }
     }
 }
 
