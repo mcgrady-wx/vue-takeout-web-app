@@ -3,7 +3,7 @@
     <div class="shop-header">
         <nav class="shop-nav" :style="{backgroundImage: `url(${info.bgImg})`}">
             <a class="back" @click="$router.back()">
-                <i class="iconfont icon-icon_arrow_left" style="color:white;"></i>
+                <i class="iconfont icon-icon_arrow_left"></i>
             </a>
         </nav>
         <!-- 商铺信息 -->
@@ -160,7 +160,7 @@ export default {
         position: absolute
         top: 10px
         left: 0
-        .icon-arrow_left
+        .icon-icon_arrow_left
           display: block
           padding: 5px
           font-size: 20px

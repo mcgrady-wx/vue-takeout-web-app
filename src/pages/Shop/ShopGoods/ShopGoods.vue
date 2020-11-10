@@ -17,7 +17,7 @@
                     <li class="food-list-hook" v-for="(good,index) in goods" :key="index">
                         <h1 class="title">{{good.name}}</h1>
                         <ul>
-                            <li class="food-item bottom-border-1px" v-for="(food,index) in good.foods" :key="index">
+                            <li class="food-item bottom-border-1px" v-for="(food,index) in good.foods" :key="index" @click="showFood(food)">
                                 <div class="icon">
                                     <img width="57" height="57" :src="food.icon">
                                 </div>
@@ -41,7 +41,11 @@
                     </li>    
                 </ul>
             </div>
+            <ShopCart />
         </div>
+        <transition name="fade">
+          <Food :food="food" v-if="isShow" @show="show"/>
+        </transition>
     </div>
 </template>
 
@@ -49,11 +53,15 @@
 import {mapState} from 'vuex'
 import BScroll from 'better-scroll'
 import CartControl from '../../../components/CartControl/CartControl'
+import Food from '../../../components/Food/Food'
+import ShopCart from '../../../components/ShopCart/ShopCart'
 export default {
     data() {
       return {
         tops:[],//收集每一个类别距离顶部的距离
         scrollY:0,//获取在Y轴上的移动距离
+        food:{},//选中的该food对象
+        isShow:false //控制显示详情组件
       }
     },
     computed: {
@@ -112,6 +120,14 @@ export default {
           this.scrollY=y
           //移动到相应位置
           this.foodsScroll.scrollTo(0,-y,300)
+        },
+        showFood(food){//显示商品详情
+          this.food=food //赋值
+          //显示详情组件
+          this.isShow=!this.isShow
+        },
+        show(){//自定义方法，显示商品详情，让子组件调用
+          this.isShow=!this.isShow
         }
     },
     watch: {
@@ -125,7 +141,9 @@ export default {
         }
     },
     components:{
-      CartControl
+      CartControl,
+      Food,
+      ShopCart
     } 
 }
 </script>
@@ -227,5 +245,9 @@ export default {
             position: absolute
             right: 0
             bottom: 12px
+  &.fade-enter-active, &.fade-leave-active
+    transition all .5s
+  &.fade-enter, &.fade-leave-to
+    opacity 0
 
 </style>
