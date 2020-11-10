@@ -55,7 +55,7 @@ const actions={
             commit(RECEIVE_USER_INFO,{})
         }  
     },
-    async getShop({commit},id){// 异步获取商品所有信息
+    async getShop({commit},id){// 异步获取商商家所有信息
         let result = await reqShop(id)
         if (result.code===0) {//请求成功，分别保存商铺信息，商家评价数组和商铺商品列表
             commit(RECEIVE_GOODS,result.data.goods)
