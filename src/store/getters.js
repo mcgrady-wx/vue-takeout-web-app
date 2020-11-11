@@ -10,6 +10,9 @@ const getters={
     },
     totalPrice(state){//购物车所有商品的总价
         return state.cartFoods.reduce((total,food)=>{return total+food.count*food.price},0)
+    },
+    badCount(state){//不满意的评价数量
+        return state.ratings.reduce((total,rating)=>{return total+rating.rateType},0)
     }
 }
 

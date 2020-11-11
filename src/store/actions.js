@@ -7,7 +7,8 @@ import {
     RECEIVE_RATINGS,
     RECEIVE_INFO,
     INCREMENT_FOOD_COUNT,
-    DECREMENT_FOOD_COUNT
+    DECREMENT_FOOD_COUNT,
+    CLEAR_CART
 } from './mutation-types'
 
 import {
@@ -69,6 +70,9 @@ const actions={
         } else { //减少
             commit(DECREMENT_FOOD_COUNT,food)
         }
+    },
+    clearCart({commit}){//同步清空购物车
+        commit(CLEAR_CART)
     }
 }
 

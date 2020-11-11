@@ -23,7 +23,7 @@
                 <div class="shopcart-list" v-show="listShow">
                     <div class="list-header">
                         <h1 class="title">购物车</h1>
-                        <span class="empty">清空</span>
+                        <span class="empty" @click="clear">清空</span>
                     </div>
                     <div class="list-content">
                         <ul>
@@ -46,8 +46,10 @@
 </template>
 
 <script>
-import {mapState,mapGetters} from 'vuex'
+import {mapState,mapGetters,mapActions} from 'vuex'
 import CartControl from '../CartControl/CartControl'
+import BScroll from 'better-scroll' 
+import { MessageBox , Toast  } from 'mint-ui'
 export default {
     data() {
         return {
@@ -74,15 +76,38 @@ export default {
                 this.isShow = false
                 return false
             }
+            if (this.isShow) {//显示的时候，初始化滚动
+              this.$nextTick(()=>{
+                //确保初始化滚得的单一性，不然每次显示都会初始化一个滚动，造成BUG
+                if (!this.scroll) {//不存在，就初始化
+                  this.scroll=new BScroll('.list-content',{
+                    click:true
+                  })
+                } else {//存在，每次显示的时候刷新列表
+                  this.scroll.refresh()
+                }
+              })
+            }
+
             return this.isShow
         }
     },
     methods: {
-        toggleShow(){
-            if (this.totalCount>0) {//要有商品才允许点击
-                this.isShow=!this.isShow
-            }    
-        }
+      ...mapActions(['clearCart']),
+      toggleShow(){
+        if (this.totalCount>0) {//要有商品才允许点击
+          this.isShow=!this.isShow
+        }    
+      },
+      clear(){//清空购物车
+        MessageBox.confirm('确定清空购物车吗?').then(action => {
+          this.clearCart()
+          Toast('已清空')
+        },action => {
+          Toast('取消成功')
+        })
+        
+      }
     },
     components:{
         CartControl

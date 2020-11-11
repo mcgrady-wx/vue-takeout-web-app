@@ -77,10 +77,27 @@ export default {
           return index
         }
     },
+    mounted() {
+      //当DOM加载完成后初始化滚动。如果滚动存在就刷新滚动。nextTick方法是延迟执行，确保数据已经更新后再执行
+      //在初始化时需要使用计时器来做延迟处理，不然当在该页面刷新的时候获取不到goods，导致BUG
+      if (!this.foodsScroll) {
+          setTimeout(()=>{
+            this.$nextTick(()=>{
+                this._initScroll() //初始化滚动
+                this._initTops() //获得右侧滚动列表的Tops
+            })
+          },200)
+      } else {
+        this.$nextTick(()=>{
+            this.leftScroll.refresh()
+            this.foodsScroll.refresh()
+        })
+      }
+    },
     methods: {
         _initScroll(){//初始化滚动
             //左侧分类
-            new BScroll('.menu-wrapper',{
+            this.leftScroll=new BScroll('.menu-wrapper',{
               click:true
             })
             //右侧列表
@@ -128,16 +145,6 @@ export default {
         },
         show(){//自定义方法，显示商品详情，让子组件调用
           this.isShow=!this.isShow
-        }
-    },
-    watch: {
-        goods(){
-            //要出现滑动效果，需要有数据。但是页面刚显示是没有数据的，所以使用钩子函数去初始化不会出现滑动效果
-            //解决办法，就是监听该数据，当数据变化的时候，再初始化滚动。nextTick方法是延迟执行，确保数据已经更新后再执行
-            this.$nextTick(()=>{
-                this._initScroll() //初始化滚动
-                this._initTops() //获得右侧滚动列表的Tops
-            })
         }
     },
     components:{

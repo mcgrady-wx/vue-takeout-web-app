@@ -1,87 +1,69 @@
 <template>
+    <!-- 评价页面 -->
     <div class="ratings" ref="ratings">
         <div class="ratings-content">
             <div class="overview">
                 <div class="overview-left">
-                    <h1 class="score">4.7</h1>
+                    <h1 class="score">{{info.score}}</h1>
                     <div class="title">综合评分</div>
                     <div class="rank">高于周边商家99%</div>
                 </div>
                 <div class="overview-right">
                     <div class="score-wrapper">
                         <span class="title">服务态度</span>
-                        <Star :score="4.6" :size="36" />
-                        <span class="score">4.6</span>
+                        <Star :score="info.serviceScore" :size="36" />
+                        <span class="score">{{info.serviceScore}}</span>
                     </div>
                     <div class="score-wrapper">
                         <span class="title">商品评分</span>
-                        <Star :score="4.7" :size="36" />
-                        <span class="score">4.7</span>
+                        <Star :score="info.foodScore" :size="36" />
+                        <span class="score">{{info.foodScore}}</span>
                     </div>
                     <div class="delivery-wrapper">
                         <span class="title">送达时间</span>
-                        <span class="delivery">30 分钟</span>
+                        <span class="delivery">{{info.deliveryTime}} 分钟</span>
                     </div>
                 </div>
             </div>
             <div class="split"></div>
             <div class="ratingselect">
                 <div class="rating-type border-1px">
-                    <span class="block positive active">
+                    <span class="block positive" :class="{active: selectType===2}" @click="selectType=2">
                         全部
-                        <span class="count">30</span>
+                        <span class="count">{{ratings.length}}</span>
                     </span>
-                    <span class="block positive">
+                    <span class="block positive" :class="{active: selectType===0}" @click="selectType=0">
                         满意
-                        <span class="count">28</span>
+                        <span class="count">{{ratings.length-badCount}}</span>
                     </span>
-                    <span class="block negative">
+                    <span class="block negative" :class="{active: selectType===1}" @click="selectType=1">
                         不满意
-                        <span class="count">2</span>
+                        <span class="count">{{badCount}}</span>
                     </span>
                 </div>
-                <div class="switch on">
+                <div class="switch" :class="{on:onlyShowText}" @click="onlyShowText=!onlyShowText">
                     <span class="iconfont icon-duigou"></span>
                     <span class="text">只看有内容的评价</span>
                 </div>
             </div>
             <div class="rating-wrapper">
                 <ul>
-                    <li class="rating-item">
+                    <li class="rating-item" v-for="(rating, index) in filterRatings" :key="index">
                         <div class="avatar">
-                            <img width="28" height="28" src="http://static.galileo.xiaojukeji.com/static/tms/default_header.png">
+                            <img width="28" height="28" :src="rating.avatar">
                         </div>
                         <div class="content">
-                            <h1 class="name">aa</h1>
+                            <h1 class="name">{{rating.username}}</h1>
                             <div class="star-wrapper">
-                                <Star :score="5" :size="24" />
-                                <span class="delivery">30</span>
+                                <Star :score="rating.score" :size="24" />
+                                <span class="delivery">{{rating.deliveryTime}}</span>
                             </div>
-                            <p class="text">不错</p>
+                            <p class="text">{{rating.text}}</p>
                             <div class="recommend">
-                                <span class="iconfont icon-tuijian"></span>
-                                <span class="item">南瓜粥</span>
-                                <span class="item">皮蛋瘦肉粥</span>
-                                <span class="item">扁豆焖面</span>
+                                <span class="iconfont" :class="rating.rateType===0 ? 'icon-tuijian' : 'icon-shoushi-tucao'"></span>
+                                <span class="item" v-for="(item, index) in rating.recommend" :key="index">{{item}}</span>
                             </div>
-                            <div class="time">2016-07-23 21:52:44</div>
-                        </div>
-                    </li>
-                    <li class="rating-item">
-                        <div class="avatar">
-                            <img width="28" height="28" src="http://static.galileo.xiaojukeji.com/static/tms/default_header.png">
-                        </div>
-                        <div class="content">
-                            <h1 class="name">aa</h1>
-                            <div class="star-wrapper">
-                                <Star :score="4" :size="24" />
-                                <span class="delivery">30</span>
-                            </div>
-                            <p class="text">不错</p>
-                            <div class="recommend">
-                                <span class="iconfont icon-thumb_down"></span>
-                            </div>
-                            <div class="time">2016-07-23 21:52:44</div>
+                            <div class="time">{{rating.rateTime | time}}</div>
                         </div>
                     </li>
                 </ul>
@@ -92,9 +74,97 @@
 
 <script>
 import Star from '../../../components/Star/Star'
+import {mapGetters, mapState} from 'vuex'
+import BScroll from 'better-scroll'
+import moment from 'moment'
 export default {
+    data() {
+      return {
+        onlyShowText: true, // 是否只显示有文本的
+        selectType: 2 , // 选择的评价类型: 0满意, 1不满意, 2全部
+      }
+    },
+    computed: {
+      ...mapState(['info','ratings']),
+      ...mapGetters(["badCount"]),
+      filterRatings(){
+        /**
+         * 显示对应的评价，需要同时满足两个条件
+         * 1、评价类型 每一个rating中rateType属性代表评价类型，0是好，1是不好。
+         *    要么selectType=2全部显示，要么selectType=rating.rateType显示对应项
+         * 2、是否显示有文本的 
+         *    !onlyShowText就表示都显示 rating.text.length>0就表示只显示有文本的
+         */
+        // 获得需要的数据
+        const {onlyShowText,selectType,ratings}=this
+        //根据条件遍历ratings，得到新的数组
+        let arr=[]
+        // if (!onlyShowText && selectType===2) {//表示全部显示 
+        //     arr=ratings
+        // } else if(onlyShowText && selectType===2){//表示只显示有文本内容的
+        //     arr=ratings.filter((rating)=>{
+        //         return rating.text.length>0
+        //     })
+        // } else if (!onlyShowText && selectType===0) {//表示显示所有的好评
+        //     arr=ratings.filter((rating)=>{
+        //         return rating.rateType===0
+        //     })
+        // } else if (onlyShowText && selectType===0) {//表示只显示有文本的好评
+        //     arr=ratings.filter((rating)=>{
+        //         return rating.rateType===0 && rating.text.length>0
+        //     })
+        // } else if (!onlyShowText && selectType===1) {//表示显示所有的差评
+        //     arr=ratings.filter((rating)=>{
+        //         return rating.rateType===1
+        //     })
+        // } else if (onlyShowText && selectType===1) {//表示显示所有的差评
+        //     arr=ratings.filter((rating)=>{
+        //         return rating.rateType===1 && rating.text.length>0
+        //     })
+        // }
+        //或者可以简写成
+        arr=ratings.filter((rating)=>{
+              return (selectType===2 || selectType===rating.rateType) && (!onlyShowText || rating.text.length>0)
+            })
+        return arr
+      }
+    },
+    mounted() {//页面初始化完成后，初始化滚动
+      if (!this.ratingsScroll) {
+          this.ratingsScroll = new BScroll('.ratings', {
+            click: true
+          })
+      } else {
+          this.$nextTick(()=>{
+            this.ratingsScroll.refresh()
+          })   
+      }
+    },
     components:{
         Star
+    },
+    watch: {
+      /*ratings(){//监听评价数据，当数据刷新后重新初始化滚动，解决在当前页面刷新后无法滚动的问题
+        if (!this.ratingsScroll) {
+          this.ratingsScroll = new BScroll('.ratings', {
+            click: true
+          })
+        } else {
+          this.$nextTick(()=>{
+            this.ratingsScroll.refresh()
+          })   
+        }
+      },*/
+      filterRatings(){//监听数据，当数据发生变化后重新计算滚动（刷新滚动），解决当选择不同数据显示的时候滚动出现问题的BUG
+        this.$nextTick(()=>{
+          this.ratingsScroll.refresh()
+        }) 
+      }
+    },
+    filters:{
+      time(value){//解析时间的过滤器
+        return moment(value).format('YYYY-MM-D HH:mm:ss')
+      }
     }
         
 }
