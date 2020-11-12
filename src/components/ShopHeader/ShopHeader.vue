@@ -2,13 +2,13 @@
     <!-- 商铺头部 -->
     <div class="shop-header">
         <nav class="shop-nav" :style="{backgroundImage: `url(${info.bgImg})`}">
-            <a class="back" @click="$router.back()">
+            <a class="back" @click="back">
                 <i class="iconfont icon-icon_arrow_left"></i>
             </a>
         </nav>
         <!-- 商铺信息 -->
         <div class="shop-content" @click="toggleShopShow">
-            <img class="content-image" :src="info.avatar">
+            <img class="content-image" v-lazy="info.avatar">
             <div class="header-content">
                 <h2 class="content-title">
                     <span class="content-tag">
@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState,mapActions} from 'vuex'
 export default {
     data() {
         return {
@@ -124,11 +124,19 @@ export default {
         ...mapState(['info'])
     },
     methods: {
+        ...mapActions(['clearCart']),
         toggleShopShow(){//显示隐藏商铺介绍
             this.shopShow=!this.shopShow
         },
         toggleSupportShow(){//显示隐藏优惠介绍
             this.supportShow=!this.supportShow
+        },
+        back(){
+          //当退出当前商家的时候，由于购物车数据保存在vuex中的cartFoods里，数据是共用的
+          //所以当进入新的商家的时候，cartFoods中保存的是上一个商家的数据
+          //解决BUG方法，在退出当前商家的时候把cartFoods中的数据清空
+          this.$router.back()//后退
+          this.clearCart()//清空购物车
         }
     },
 }

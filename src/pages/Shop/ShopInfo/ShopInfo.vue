@@ -30,7 +30,7 @@
                 <div class="pic-wrapper">
                     <ul class="pic-list" ref="picsUl">
                         <li class="pic-item"  v-for="(pic, index) in info.pics" :key="index">
-                            <img width="120" height="90" :src="pic"/>
+                            <img width="120" height="90" v-lazy="pic"/>
                         </li>
                     </ul>
                 </div>

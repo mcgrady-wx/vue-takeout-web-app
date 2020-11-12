@@ -5,7 +5,7 @@
               <li class="shop_li border-1px" v-for="(shop,index) in shops" :key="index" @click="goToShop(shop.id)">
                 <a>
                   <div class="shop_left">
-                    <img class="shop_img" :src="shop.image_path">
+                    <img class="shop_img" v-lazy="shop.image_path">
                   </div>
                   <div class="shop_right">
                     <section class="shop_detail_header">

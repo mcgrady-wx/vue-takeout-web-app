@@ -9,7 +9,8 @@ import {
     RECEIVE_INFO,
     INCREMENT_FOOD_COUNT,
     DECREMENT_FOOD_COUNT,
-    CLEAR_CART
+    CLEAR_CART,
+    RECEIVE_SEARCH_SHOPS
 } from './mutation-types'
 
 const mutations={
@@ -64,6 +65,9 @@ const mutations={
         });
         //2、把cartFoods置为空对象
         state.cartFoods=[]
+    },
+    [RECEIVE_SEARCH_SHOPS](state,searchshops){//获取搜索商家数组
+        state.searchShops=searchshops
     }
 }
 

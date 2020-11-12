@@ -40,7 +40,7 @@ export default {
 
 <style lang="stylus" scoped>
     @import '../../common/stylus/mixins.styl'
-    .star //2x图 3x图
+    .star 
         float left
         font-size 0
         .star-item

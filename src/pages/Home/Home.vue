@@ -19,7 +19,7 @@
             <swiper-slide class="swiper-slide" v-for="(categorys,index) in categorysArr" :key="index">
               <a href="javascript:" class="link_to_food" v-for="(category,index) in categorys" :key="index">
                 <div class="food_container">
-                  <img :src="baseImageUrl+category.image_url">
+                  <img v-lazy="baseImageUrl+category.image_url">
                 </div>
                 <span>{{category.title}}</span>
               </a>
@@ -99,7 +99,7 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
     @import '../../common/stylus/mixins.styl'
-    .msite  //首页
+    .msite  
           width 100%
           .msite_nav
             bottom-border-1px(#e4e4e4)

@@ -13,7 +13,10 @@
                 <router-link to="info" replace>商家</router-link>
             </div>
         </div>
-        <router-view></router-view>
+        <keep-alive>
+            <!-- 缓存路由组件对象，缓存数据 -->
+            <router-view></router-view>
+        </keep-alive>
     </div>
 </template>
 

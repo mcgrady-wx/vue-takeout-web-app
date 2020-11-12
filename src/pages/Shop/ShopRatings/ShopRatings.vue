@@ -50,7 +50,7 @@
                 <ul>
                     <li class="rating-item" v-for="(rating, index) in filterRatings" :key="index">
                         <div class="avatar">
-                            <img width="28" height="28" :src="rating.avatar">
+                            <img width="28" height="28" v-lazy="rating.avatar">
                         </div>
                         <div class="content">
                             <h1 class="name">{{rating.username}}</h1>
@@ -76,7 +76,7 @@
 import Star from '../../../components/Star/Star'
 import {mapGetters, mapState} from 'vuex'
 import BScroll from 'better-scroll'
-import moment from 'moment'
+//import moment from 'moment' //由于moment.js太大，用date-fns代替。同时有可能多个地方会用到时间显示的过滤器，所以直接定义成一个全局的filter
 export default {
     data() {
       return {
@@ -161,11 +161,11 @@ export default {
         }) 
       }
     },
-    filters:{
-      time(value){//解析时间的过滤器
-        return moment(value).format('YYYY-MM-D HH:mm:ss')
-      }
-    }
+    // filters:{
+    //   time(value){//解析时间的过滤器
+    //     return moment(value).format('YYYY-MM-D HH:mm:ss')
+    //   }
+    // }
         
 }
 </script>
